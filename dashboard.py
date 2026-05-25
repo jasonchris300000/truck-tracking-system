@@ -102,11 +102,20 @@ def dashboard():
         #header { padding: 15px; background: #16213e; text-align: center; font-size: 22px; }
         #map { height: 80vh; width: 100%; }
         #info { padding: 10px; background: #16213e; text-align: center; }
+        #sidebar { position: fixed; top: 60px; right: 0; width: 220px; background: #16213e; height: 80vh; overflow-y: auto; padding: 10px; z-index: 1000; }
+        #sidebar h3 { text-align: center; border-bottom: 1px solid #444; padding-bottom: 8px; }
+        .truck-card { background: #0f3460; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .truck-name { font-size: 16px; font-weight: bold; color: #e74c3c; }
+        .truck-speed { font-size: 13px; color: #aaa; margin-top: 4px; }
     </style>
 </head>
 <body>
     <div id="header">LIVE TRUCK TRACKER - KAMPALA</div>
     <div id="map"></div>
+    <div id="sidebar">
+        <h3>Active Trucks</h3>
+        """ + "".join([f'<div class="truck-card"><div class="truck-name">{tid}</div><div class="truck-speed">Speed: {data["speed"]} km/h</div></div>' for tid, data in truck_locations.items()]) + """
+    </div>
     <div id="info">Auto-refreshes every 5 seconds</div>
 <script>
     var savedLat = localStorage.getItem('mapLat') || 0.3476;
