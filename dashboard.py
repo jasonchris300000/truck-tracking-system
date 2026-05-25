@@ -66,7 +66,7 @@ def driver():
         function sendLocation(pos) {
             var lat = pos.coords.latitude;
             var lng = pos.coords.longitude;
-            var speed = pos.coords.speed || 0;
+            var speed = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(1) : 0;
             document.getElementById('coords').innerText = 'Lat: ' + lat.toFixed(4) + ' Lng: ' + lng.toFixed(4);
             fetch('/update-location', {
                 method: 'POST',
