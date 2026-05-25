@@ -34,9 +34,35 @@ def driver():
 <head><title>Driver Tracker</title></head>
 <body style="font-family:Arial; text-align:center; padding:40px; background:#1a1a2e; color:white;">
     <h2>Driver Tracker</h2>
-    <p id="status">Starting...</p>
-    <p id="coords"></p>
+    <div id="login" >
+        <p>Enter your name to start tracking:</p>
+        <input id="nameInput" type="text" placeholder="Your name" 
+            style="padding:10px; font-size:16px; border-radius:8px; border:none; margin-bottom:15px;">
+        <br>
+        <button onclick="startTracking()" 
+            style="padding:10px 30px; font-size:16px; background:#e74c3c; color:white; border:none; border-radius:8px; cursor:pointer;">
+            Start Tracking
+        </button>
+    </div>
+    <div id="tracking" style="display:none;">
+        <p id="status">Sending location...</p>
+        <p id="coords"></p>
+    </div>
     <script>
+        var driverName = "";
+        function startTracking() {
+            driverName = document.getElementById('nameInput').value.trim();
+            if (!driverName) {
+                alert("Please enter your name");
+                return;
+            }
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('tracking').style.display = 'block';
+            setInterval(function() {
+                navigator.geolocation.getCurrentPosition(sendLocation, error);
+            }, 3000);
+
+        }
         function sendLocation(pos) {
             var lat = pos.coords.latitude;
             var lng = pos.coords.longitude;
@@ -46,21 +72,16 @@ def driver():
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    truck_id: 'DRIVER_PHONE',
+                    truck_id: driverName,
                     latitude: lat,
                     longitude: lng,
                     speed: speed
                 })
             });
-            document.getElementById('status').innerText = 'Sending location...';
+            document.getElementById('status').innerText = 'Sending location as: ' + driverName;
         }
         function error() {
             document.getElementById('status').innerText = 'GPS error - allow location access';
-        }
-        if (navigator.geolocation) {
-            setInterval(function() {
-                navigator.geolocation.getCurrentPosition(sendLocation, error);
-            }, 3000);
         }
     </script>
 </body>
