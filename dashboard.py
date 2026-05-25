@@ -108,20 +108,28 @@ def dashboard():
     <div id="header">LIVE TRUCK TRACKER - KAMPALA</div>
     <div id="map"></div>
     <div id="info">Auto-refreshes every 5 seconds</div>
-    <script>
-        var map = L.map('map').setView([0.3476, 32.5825], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        var trucks = """ + trucks_json + """;
-        for (var id in trucks) {
-            var t = trucks[id];
-            L.circleMarker([t.latitude, t.longitude], {
-                radius: 12,
-                color: 'red',
-                fillColor: 'red',
-                fillOpacity: 1
-            }).addTo(map).bindPopup(id + '<br>Speed: ' + t.speed + ' km/h');
-        }
-    </script>
+<script>
+    var savedLat = localStorage.getItem('mapLat') || 0.3476;
+    var savedLng = localStorage.getItem('mapLng') || 32.5825;
+    var savedZoom = localStorage.getItem('mapZoom') || 13;
+    var map = L.map('map').setView([savedLat, savedLng], savedZoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    map.on('moveend', function() {
+        localStorage.setItem('mapLat', map.getCenter().lat);
+        localStorage.setItem('mapLng', map.getCenter().lng);
+        localStorage.setItem('mapZoom', map.getZoom());
+    });
+    var trucks = """ + trucks_json + """;
+    for (var id in trucks) {
+        var t = trucks[id];
+        L.circleMarker([t.latitude, t.longitude], {
+            radius: 12,
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 1
+        }).addTo(map).bindPopup(id + '<br>Speed: ' + t.speed + ' km/h');
+    }
+</script>
 </body>
 </html>"""
     return html
