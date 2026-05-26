@@ -99,7 +99,8 @@ def driver():
 def dashboard():
     import time
     now = time.time()
-    trucks_json = json.dumps(truck_locations)
+    clean_trucks = {tid: {"latitude": data["latitude"], "longitude": data["longitude"], "speed": data["speed"]} for tid, data in truck_locations.items()}
+    trucks_json = json.dumps(clean_trucks)
     inactive = [tid for tid, data in truck_locations.items() if now - data.get("last_seen", now) > 60]
     inactive_json = json.dumps(inactive)
     html = """<!DOCTYPE html>
