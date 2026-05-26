@@ -15,7 +15,7 @@ while True:
     speed = random.uniform(20, 80)
 
     requests.post(
-        "http://127.0.0.1:8001/update-location",
+        "http://127.0.0.1:8000/update-location",
         json={
             "truck_id": "TRUCK_1",
             "latitude": lat,

@@ -74,7 +74,7 @@ def driver():
         function sendLocation(pos) {
             var lat = pos.coords.latitude;
             var lng = pos.coords.longitude;
-            var speed = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(1) : 0;
+            var speed = pos.coords.speed ? Number((pos.coords.speed * 3.6).toFixed(1)) : 0;
             document.getElementById('coords').innerText = 'Lat: ' + lat.toFixed(4) + ' Lng: ' + lng.toFixed(4);
             fetch('/update-location', {
                 method: 'POST',
@@ -131,9 +131,9 @@ def dashboard():
     </div>
     <div id="info">Auto-refreshes every 5 seconds</div>
 <script>
-    var savedLat = localStorage.getItem('mapLat') || 0.3476;
-    var savedLng = localStorage.getItem('mapLng') || 32.5825;
-    var savedZoom = localStorage.getItem('mapZoom') || 13;
+    var savedLat = parseFloat(localStorage.getItem('mapLat')) || 0.3476;
+    var savedLng = parseFloat(localStorage.getItem('mapLng')) || 32.5825;
+    var savedZoom = parseInt(localStorage.getItem('mapZoom')) || 13;
     var map = L.map('map').setView([savedLat, savedLng], savedZoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     map.on('moveend', function() {

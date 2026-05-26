@@ -9,7 +9,7 @@ m = folium.Map(location=[0.3476, 32.5825], zoom_start=14)
 for truck_id, data in trucks.items():
     folium.CircleMarker(
         location=[data["latitude"], data["longitude"]],
-        radius=200,
+        radius=6,
         color="black",
         fill=True,
         fill_color="black",
