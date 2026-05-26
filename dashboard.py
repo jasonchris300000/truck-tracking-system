@@ -15,14 +15,21 @@ class LocationUpdate(BaseModel):
 
 @app.post("/update-location")
 def update_location(location: LocationUpdate):
+    import time
     truck_locations[location.truck_id] = {
         "latitude": location.latitude,
         "longitude": location.longitude,
-        "speed": location.speed
+        "speed": location.speed,
+        "last_seen": time.time()
     }
     return {"status": "ok", "truck_id": location.truck_id}
 
 @app.get("/trucks")
+@app.delete("/remove-truck/{truck_id}")
+def remove_truck(truck_id: str):
+    if truck_id in truck_locations:
+        del truck_locations[truck_id]
+    return {"status": "removed", "truck_id": truck_id}
 def get_trucks():
     return truck_locations
 
@@ -89,7 +96,11 @@ def driver():
 
 @app.get("/", response_class=HTMLResponse)
 def dashboard():
+    import time
+    now = time.time()
     trucks_json = json.dumps(truck_locations)
+    inactive = [tid for tid, data in truck_locations.items() if now - data.get("last_seen", now) > 60]
+    inactive_json = json.dumps(inactive)
     html = """<!DOCTYPE html>
 <html>
 <head>
@@ -137,6 +148,26 @@ def dashboard():
             fillColor: 'red',
             fillOpacity: 1
         }).addTo(map).bindPopup(id + '<br>Speed: ' + t.speed + ' km/h');
+    }
+    var inactive = """ + inactive_json + """;
+    inactive.forEach(function(tid) {
+        var warning = document.getElementById('warning-' + tid);
+        if (!warning) {
+            var div = document.createElement('div');
+            div.id = 'warning-' + tid;
+            div.style = 'background:#e74c3c; padding:10px; margin:10px; border-radius:8px; text-align:center;';
+            div.innerHTML = '<b>' + tid + '</b> has gone offline!<br><br>' +
+                '<button onclick="markDone(\'' + tid + '\')" style="background:white; color:red; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px">Mark as Done</button>' +
+                '<button onclick="keepTracking(\'' + tid + '\')" style="background:#2ecc71; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Keep Tracking</button>';
+            document.getElementById('header').after(div);
+        }
+    });
+    function markDone(tid) {
+        fetch('/remove-truck/' + tid, {method: 'DELETE'});
+        document.getElementById('warning-' + tid).remove();
+    }
+    function keepTracking(tid) {
+        document.getElementById('warning-' + tid).remove();
     }
 </script>
 </body>
