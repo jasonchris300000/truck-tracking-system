@@ -25,13 +25,14 @@ def update_location(location: LocationUpdate):
     return {"status": "ok", "truck_id": location.truck_id}
 
 @app.get("/trucks")
+def get_trucks():
+    return truck_locations
+
 @app.delete("/remove-truck/{truck_id}")
 def remove_truck(truck_id: str):
     if truck_id in truck_locations:
         del truck_locations[truck_id]
     return {"status": "removed", "truck_id": truck_id}
-def get_trucks():
-    return truck_locations
 
 
 @app.get("/driver", response_class=HTMLResponse)
